@@ -6,6 +6,7 @@ const cors=require("cors");
 const connectDB = require("./configs/mongodbconnect");
 const sendmail = require("./service/sendmail");
 const PORT=process.env.PORT;
+const filerouter=require("./routes/fileuploadroute");
 
 app.use(cors());
 
@@ -14,13 +15,13 @@ connectDB();
 app.use(express.json());
 
 let emailoptions={
-    emailTo:"abc@gmail.com",
-    emailFrom:"cba@gmail.com",
+    emailTo:"singhvidhiii.9@gmail.com",
+    emailFrom:"vidhi.singh.parihar.2711@gmail.com",
     link:"abcd",
-    filename:"dcba",size:123
+    filename:"dcba",
+    size:123
 }
 
-app.get("/send",(req,res)=>{
-    sendmail(emailoptions);
-    res.send("MAIL SENT SUCCESFULLY");
-})
+app.use('/',filerouter);
+
+//will upload file from postman using form-data in body

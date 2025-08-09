@@ -76,4 +76,4 @@ async function redirectUrl(shortid)
         throw new Error('Error redirecting URL : '+error.message);
     }
 }
-module.exports={shortenurl,redirectUrl};
+module.exports={shortenurl,redirectUrl,shorten};

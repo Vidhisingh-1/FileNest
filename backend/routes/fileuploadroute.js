@@ -11,8 +11,9 @@ const { validateFile } = require("../middleware/validateFile.js");
 
 router.post("/upload",upload.single('file'),validateFile,async(req,res)=>{
     try{
-        const {expiry='never'}=req.body;
+        let {expiry='never',emailTo,emailFrom}=req.body;
         const expiryDate=null;
+
         if(expiry!=='never'){
         expiryDate=new Date(Date.now()+7*24*60*60*1000);
         }
@@ -22,20 +23,32 @@ router.post("/upload",upload.single('file'),validateFile,async(req,res)=>{
         });
         fs.unlinkSync(req.file.path);
 
-        const shortId=(await shorten(result.url)).shorturl;
+        const shortDoc=(await shorten(result.secure_url));
+
         const createdfileinfo=await File.create({
-            shortId,
-            cloudinaryurl:result.url,
+            shortId:shortDoc.shorturl,
+            cloudinaryurl:result.secure_url,
             filename:req.file.originalname,
             size:req.file.size,
             expiry:expiryDate,
             
         });
-        await sendmail({})
+        if(emailTo && emailFrom){
+        await sendmail(
+            {
+                emailTo,
+                emailFrom,
+                link:'https://file-nest.me/${shortDoc.shorturl}',
+                filename:req.file.originalname,
+                size:req.file.size
+            }
+        );
+    }
         res.json({createdfileinfo});
     }
     catch(err)
     {
+        console.error(err);
         res.status(500).json({error:err.message});
     }
 })

@@ -4,10 +4,23 @@ async function markallfilesexpiryindb()
     try{
         const now=new Date();
 
-        const result=await File.updateMany(
+        const expiredFiles=await File.find(
             {expiry:{$lte:now},isExpired:false},
-            {$set:{isExpired:true}}
         );
+        for(let file of expiredFiles)
+        {
+            try{
+                const publicId = file.cloudinaryurl.split("/").pop().split(".")[0];
+                await cloudinary.uploader.destroy(publicId);
+
+                file.isExpired=true;
+                await file.save();
+            }
+            catch(err)
+            {
+                console.error("Error deleting file:",err.message);
+            }
+        }
     }
     catch(err)
     {

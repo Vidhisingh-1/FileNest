@@ -11,19 +11,17 @@ const ExpiryCron = require("./service/cronJob");
 
 app.use(cors());
 
+app.use(express.json());
+
 connectDB();
 ExpiryCron();
 
-app.use(express.json());
-
-let emailoptions={
-    emailTo:"singhvidhiii.9@gmail.com",
-    emailFrom:"vidhi.singh.parihar.2711@gmail.com",
-    link:"abcd",
-    filename:"dcba",
-    size:123
-}
-
 app.use('/',filerouter);
+
+app.listen(PORT,()=>{
+    console.log(`Server running on port ${PORT}`);
+});
+
+
 
 //will upload file from postman using form-data in body

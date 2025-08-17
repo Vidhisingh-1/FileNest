@@ -7,10 +7,12 @@ const connectDB = require("./configs/mongodbconnect");
 const sendmail = require("./service/sendmail");
 const PORT=process.env.PORT;
 const filerouter=require("./routes/fileuploadroute");
+const ExpiryCron = require("./service/cronJob");
 
 app.use(cors());
 
 connectDB();
+ExpiryCron();
 
 app.use(express.json());
 

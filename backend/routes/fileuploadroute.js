@@ -12,7 +12,10 @@ const { validateFile } = require("../middleware/validateFile.js");
 router.post("/upload",upload.single('file'),validateFile,async(req,res)=>{
     try{
         const {expiry='never'}=req.body;
-
+        const expiryDate=null;
+        if(expiry!=='never'){
+        expiryDate=new Date(Date.now()+7*24*60*60*1000);
+        }
         const result=await cloudinary.uploader.upload(req.file.path,{
             resource_type:'auto',
 
@@ -25,8 +28,9 @@ router.post("/upload",upload.single('file'),validateFile,async(req,res)=>{
             cloudinaryurl:result.url,
             filename:req.file.originalname,
             size:req.file.size,
-            expiry
-        })
+            expiry:expiryDate,
+            
+        });
         await sendmail({})
         res.json({createdfileinfo});
     }

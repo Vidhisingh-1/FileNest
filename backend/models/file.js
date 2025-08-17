@@ -15,12 +15,12 @@ const fileSchema=new mongoose.Schema({
         type:Date,
     },
     isExpired:{
-        type:boolean,
+        type:Boolean,
         default:false
     },
     filename:String,
     size:Number,
-    createdAt:Date,
-    updatedAt:Date
-});
+},
+    {timestamps:true}
+);
 module.exports=mongoose.model('File',fileSchema);

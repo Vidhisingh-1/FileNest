@@ -1,8 +1,9 @@
 const cron=require("node-cron");
+const markallfilesexpiryindb = require("./markexpiry");
 
 function ExpiryCron()
 {
-    cron.schedule('* * * * *',()=>{
+    cron.schedule('30 16 * * *',()=>{
         //every day at 4:30 P.M.
         markallfilesexpiryindb();
     });

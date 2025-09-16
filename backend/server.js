@@ -4,24 +4,29 @@ const dotenv=require("dotenv");
 dotenv.config();
 const cors=require("cors");
 const connectDB = require("./configs/mongodbconnect");
-const sendmail = require("./service/sendmail");
-const PORT=process.env.PORT ;
-const filerouter=require("./routes/fileuploadroute");
-const ExpiryCron = require("./service/cronJob");
-const authRoutes=require("./routes/auth.js");
-app.use(cors());
+const signupRoute = require('./routes/signupRoute');
+const signinRoute = require('./routes/signinRoute');
+const userDataRoute = require('./routes/userDataRoute');
+const fileUploadRoute = require('./routes/fileUploadRoute');
+const sendMailRoute = require('./routes/sendMailRoute');
 
+app.use(cors());
 app.use(express.json());
 
 connectDB();
-ExpiryCron();
 
-app.use('/',authRoutes);
-
-app.listen(PORT,()=>{
-    console.log(`Server running on port ${PORT}`);
+app.get('/', (req, res) => {
+    res.send("Welcome to File-Sharing-App");
 });
 
+app.use('/', signupRoute);
+app.use('/', signinRoute);
+app.use('/', userDataRoute);
+app.use('/', fileUploadRoute);
+app.use('/', sendMailRoute);
 
+app.listen(process.env.PORT, () => {
+    console.log(`Server is running on port ${process.env.PORT}`);
+})
 
 //will upload file from postman using form-data in body

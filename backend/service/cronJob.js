@@ -1,12 +1,8 @@
 const cron=require("node-cron");
-const markallfilesexpiryindb = require("./markexpiry");
+const { deleteData } = require("../repository/fileSharingRepository");
 
-function ExpiryCron()
-{
-    cron.schedule('30 16 * * *',()=>{
-        //every day at 4:30 P.M.
-        markallfilesexpiryindb();
-    });
-}
-//minute hour day of month month day of week
-module.exports=ExpiryCron;
+cron.schedule('0 7 * * *', () => {
+    deleteData();
+});
+
+module.exports = cron;

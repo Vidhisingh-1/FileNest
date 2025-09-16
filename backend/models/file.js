@@ -1,8 +1,12 @@
 const mongoose=require("mongoose");
-const { date } = require("zod");
+
 
 const fileSchema=new mongoose.Schema({
-    shortId:{
+    userName : {
+        type : String,
+        required : true
+    },
+    shortUrl:{
         type:String,
         unique:true,
         required:true
@@ -11,16 +15,27 @@ const fileSchema=new mongoose.Schema({
         type:String,
         required:true
     },
-    expiry:{
-        type:Date,
+    fileName : {
+        type : String,
+        required : true
     },
-    isExpired:{
-        type:Boolean,
-        default:false
+    size : {
+        type : Number,
+        required : true
     },
-    filename:String,
-    size:Number,
-},
-    {timestamps:true}
-);
+    createdAt : {
+        type : Date,
+        default : Date.now(),
+        required : true
+    },
+    expiryAt : {
+        type : Date,
+        required : true
+    },
+    isExpired : {
+        type : Boolean,
+        default : false
+    }
+
+});
 module.exports=mongoose.model('File',fileSchema);

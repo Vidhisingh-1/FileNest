@@ -1,0 +1,15 @@
+const User = require('../models/users');
+
+async function saveUser ({userName, hashedPassword})
+{
+    const newUser = new User({userName, hashedPassword});
+
+    return await newUser.save();
+}
+
+async function findUser ({userName})
+{
+    return await User.findOne({userName});
+}
+
+module.exports = {saveUser, findUser};

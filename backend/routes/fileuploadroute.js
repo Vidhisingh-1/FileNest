@@ -1,50 +1,48 @@
-const File=require("../models/file.js");
-const express=require('express');
-const router=express.Router();
-const multer=require("multer");
-const upload=multer({dest:'uploads/'});
-const cloudinary=require("../configs/cloudinaryconfig.js");
-const fs=require("fs");
-const { shortenurl, shorten } = require("../service/urlservice.js");
-const sendmail=require("../service/sendmail.js");
-const { validateFile } = require("../middleware/validateFile.js");
+const express = require('express');
+const dotenv = require('dotenv');
+dotenv.config();
+const multer = require('multer');
+const fs = require('fs');
+const upload = multer({ dest: 'uploads/' });
+const router = express.Router();
+const cloudinary = require('../configs/cloudinaryConfig');
+const axios = require('axios');
+const File = require('../models/file');
+const fileTypeValidator = require('../middlewares/fileValidator');
+const validateToken = require('../middlewares/tokenValidator');
+const { shorten } = require('../service/urlservice');
 
-router.post("/upload",upload.single('file'),validateFile,async(req,res)=>{
+router.post("/upload",upload.single('file'),validateToken,fileTypeValidator,async(req,res)=>{
     try{
-        let {expiry='never',emailTo,emailFrom}=req.body;
-        const expiryDate=null;
+        const expiry = req.body.expiry;
 
-        if(expiry!=='never'){
-        expiryDate=new Date(Date.now()+7*24*60*60*1000);
+        if (!req.file)
+        {
+            res.json({
+                message : "No file uploaded"
+            });
+            return;
         }
-        const result=await cloudinary.uploader.upload(req.file.path,{
-            resource_type:'auto',
 
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            resource_type : 'auto'
         });
+
         fs.unlinkSync(req.file.path);
 
         const shortDoc=(await shorten(result.secure_url));
-
-        const createdfileinfo=await File.create({
-            shortId:shortDoc.shorturl,
+        const shortId=shortDoc.shorturl;
+        const createdFile=await File.create({
+            userName:req.body.userName,
+            shortUrl:shortId,
             cloudinaryurl:result.secure_url,
             filename:req.file.originalname,
             size:req.file.size,
-            expiry:expiryDate,
-            
+            expiryAt:new Date(expiry).getTime(),
+            createdAt:Date.now(),
         });
-        if(emailTo && emailFrom){
-        await sendmail(
-            {
-                emailTo,
-                emailFrom,
-                link:'https://file-nest.me/${shortDoc.shorturl}',
-                filename:req.file.originalname,
-                size:req.file.size
-            }
-        );
-    }
-        res.json({createdfileinfo});
+        
+        res.json({createdFile});
     }
     catch(err)
     {
